@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+
+{% block content %}
+<div class="text-center">
+  <div class="header-block">
+    <a href="/" class="logo-link text-center">
+      <img src="{% static 'img/logo.png' %}" class="logo" >
+    </a>
+    <h1>Логистическая компания «Млечный путь»</h1>
+    <p>Для продолжения работы Вам необходимо авторизоваться</p>
+  </div>
+  <form action="{% url 'login' %}" method="post" class="login-form">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary" name="login-button">Войти</button>
+  </form>
+</div>
+{% endblock %}
