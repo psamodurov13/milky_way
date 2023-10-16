@@ -28,10 +28,17 @@ def index(request):
                 'from_city': user_city,
                 'to_city': city
             })
+        for route in routes:
+            from_offices = Office.objects.filter(city=route['from_city'])
+            to_offices = Office.objects.filter(city=route['to_city'])
+            parcels = Parcel.objects.filter(from_office__in=from_offices, to_office__in=to_offices)
+            logger.info(f'PARCELS - {parcels}')
+            route['parcels'] = parcels
         logger.info(f'ROUTES - {routes}')
         logger.info(f'USER OFFICE - {user_office}')
         context['office'] = user_office
         context['routes'] = routes
+
         # logger.info(request.user)
         return render(request, 'logistic/index-employee.html', context)
     elif request.user.is_superuser:

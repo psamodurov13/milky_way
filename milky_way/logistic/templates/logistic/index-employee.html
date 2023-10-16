@@ -9,11 +9,21 @@
 </div>
 <div class="user-office-block">
   <div class="user-info">
-    {{ user.first_name }} {{ user.last_name }}
-    {{ user.office.name }}
+    <div clss="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+    <div class="user-office">{{ user.office.name }}</div>
   </div>
   <div class="office-balance">
-
+    <div class="balance">Баланс: </div>
   </div>
 </div>
+<div class="routes">
+  <div class="routes_list my-3">
+  {% for route in routes %}
+    <button type="button" class="btn btn-primary btn-sm" id="{{ route.from_city.id }}to{{ route.to_city.id }}">{{ route.name }}</button>
+  {% endfor %}
+  </div>
+  <a type="button" class="btn btn-primary new-parcel-button">Новая посылка</a>
+
+</div>
+
 {% endblock %}
