@@ -18,3 +18,18 @@ margin-bottom: 100px;
 --bs-alert-border-color: #f1aeb5;
 --bs-alert-link-color: #b02a37;
 }
+
+form small.error {
+color: red !important;
+}
+
+#search-form {
+display: flex;
+}
+#search-form #div_id_search {
+display: flex;
+width: 100%;
+}
+#search-form button {
+display: flex;
+}

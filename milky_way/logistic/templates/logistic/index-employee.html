@@ -3,13 +3,25 @@
 {% load crispy_forms_filters %}
 
 {% block content %}
+<script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+</script>
+
+<script src=
+"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+</script>
+
+<link href=
+"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
+rel="stylesheet" type="text/css" />
+
+
 <div class="text-center">
   <h1>{{ title }}</h1>
-  <h6>{{ template }}</h6>
 </div>
 <div class="user-office-block">
   <div class="user-info">
-    <div clss="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+    <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
     <div class="user-office">{{ user.office.name }}</div>
   </div>
   <div class="office-balance">
@@ -19,11 +31,149 @@
 <div class="routes">
   <div class="routes_list my-3">
   {% for route in routes %}
-    <button type="button" class="btn btn-primary btn-sm" id="{{ route.from_city.id }}to{{ route.to_city.id }}">{{ route.name }}</button>
+    <button type="button" class="btn btn-primary btn-sm" id="{{ route.from_city.id }}to{{ route.to_city.id }}" >{{ route.name }}</button>
   {% endfor %}
   </div>
-  <a type="button" class="btn btn-primary new-parcel-button">Новая посылка</a>
+</div>
 
+  <form id="search-form" method="GET" action="{% url 'index' %}">
+          {{ search_form|crispy }}
+          <button type="submit" class="btn btn-primary ms-3 mb-3">Поиск</button>
+  </form>
+
+  <a type="button" class="btn btn-primary new-parcel-button" id="new-parcel-button" data-bs-toggle="modal" data-bs-target="#newParcelModal">Новая посылка</a>
+  {% if page_obj %}
+  <table class="table table-success table-striped my-3">
+    <thead>
+      <tr>
+        <th scope="col">Дата оформления</th>
+        <th scope="col">ФИО</th>
+        <th scope="col">Телефон отправителя</th>
+        <th scope="col">Телефон получателя</th>
+        <th scope="col">Код</th>
+        <th scope="col">Плательщик</th>
+        <th scope="col">Статус оплаты</th>
+        <th scope="col">Статус посылки</th>
+        <th scope="col">Дата выдачи</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for parcel in page_obj %}
+      <tr>
+        <th>{{ parcel.created_at|date:'d.m.y H:i' }}</th>
+        <td>{{ parcel.to_customer.name }}</td>
+        <td>{{ parcel.from_customer.phone }}</td>
+        <td>{{ parcel.to_customer.phone }}</td>
+        <td>{{ parcel.id }}</td>
+        <td>{{ parcel.payer.name }}</td>
+        <td>{{ parcel.payment_status }}</td>
+        <td>{{ parcel.ship_status }}</td>
+        <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+    {% include 'inc/_pagination.html' %}
+  {% else %}
+  <p>Посылок нет</p>
+  {% endif %}
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="newParcelModal" tabindex="-1" aria-labelledby="newParcelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="newParcelModalLabel">Новая посылка</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="new-parcel-form" method="POST" action="{% url 'create_new_parcel' %}">
+          {% csrf_token %}
+          {{ new_parcel_form|crispy }}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Создать посылку</button>
+
+          <script>
+          $( function() {
+            var availableTags = [
+                {% for customer in customers %}
+                    "{{ customer.name }} / {{ customer.id }} / {{ customer.phone }}",
+                {% endfor %}
+            ];
+            function handleCustomerSelection(selectedValue, phoneField) {
+                var customerPhone = selectedValue.split(" / ")[2];
+                $(phoneField).val(customerPhone);
+                $('#id_from_customer').blur()
+                $('#id_to_customer').blur()
+              }
+
+              // Применяем автозаполнение и обработчик для id_from_customer и id_from_customer_phone
+              $("#id_from_customer").autocomplete({
+                source: availableTags,
+                select: function(event, ui) {
+                  handleCustomerSelection(ui.item.value, "#id_from_customer_phone");
+                }
+              });
+
+              // Применяем автозаполнение и обработчик для id_to_customer и id_to_customer_phone
+              $("#id_to_customer").autocomplete({
+                source: availableTags,
+                select: function(event, ui) {
+                  handleCustomerSelection(ui.item.value, "#id_to_customer_phone");
+                }
+              });
+            });
+
+
+          </script>
+          <script>
+              const nameField = document.querySelector('#id_from_customer')
+              nameField.addEventListener('change', () => {
+                  console.log(nameField.value)
+              })
+          </script>
+          <script type="text/javascript">
+              $('#new-parcel-form').submit(function(e){
+                  e.preventDefault();
+                  $('#new-parcel-form small').remove();
+                  $form = $(this)
+                  const formData = new FormData(this);
+                  $.ajax({
+                      url: '{% url "create_new_parcel" %}',
+                      type: 'POST',
+                      data: formData,
+                      success: function (response) {
+                          $('.error').remove();
+                          console.log(response)
+                          if(response.error){
+                              alert(response.message)
+                              $.each(response.errors, function(name, error){
+                                  error = '<small class="text-muted error">' + error + '</small>'
+                                  $form.find('[name=' + name + ']').after(error);
+                              })
+                          }
+                          else{
+                              alert(response.message)
+                              location.reload();
+                          }
+                          // $('#create_new_parcel #id_phone').val('');
+                      },
+                      cache: false,
+                      contentType: false,
+                      processData: false
+                  });
+              });
+              // end
+          </script>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

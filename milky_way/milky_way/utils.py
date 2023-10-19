@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 
+
 class BaseAdmin(admin.ModelAdmin):
     save_as = True
     save_on_top = True

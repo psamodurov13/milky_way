@@ -5,6 +5,69 @@
 {% block content %}
 <div class="text-center">
   <h1>{{ title }}</h1>
-  <h2>{{ template }}</h2>
 </div>
+<div class="admin-menu">
+  <a href="{% url 'employees' %}">Сотрудники</a>
+  <a href="{% url 'accounting' %}">Бухгалтерия</a>
+  <a href="{% url 'reports' %}">Отчеты</a>
+</div>
+<div class="user-office-block">
+  <div class="office-balance">
+    <div class="balance">Баланс: </div>
+  </div>
+</div>
+<div class="routes">
+  <div class="routes_list my-3">
+  {% for route in routes %}
+    <a href="{% url 'change_route' route.from_city.id route.to_city.id %}" type="button" class="btn btn-primary btn-sm" id="{{ route.from_city.id }}to{{ route.to_city.id }}" >{{ route.name }}</a>
+  {% endfor %}
+  </div>
+</div>
+
+  <form id="search-form" method="GET" action="{% url 'index' %}">
+    {{ search_form|crispy }}
+    <button type="submit" class="btn btn-primary ms-3 mb-3">Поиск</button>
+  </form>
+  {% if page_obj %}
+  <table class="table table-success table-striped my-3">
+    <thead>
+      <tr>
+        <th scope="col">Дата оформления</th>
+        <th scope="col">ФИО</th>
+        <th scope="col">Телефон отправителя</th>
+        <th scope="col">Телефон получателя</th>
+        <th scope="col">Код</th>
+        <th scope="col">Плательщик</th>
+        <th scope="col">Статус оплаты</th>
+        <th scope="col">Статус посылки</th>
+        <th scope="col">Дата выдачи</th>
+        <th scope="col">Посылку оформил</th>
+        <th scope="col">Посылку выдал</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for parcel in page_obj %}
+      <tr>
+        <th>{{ parcel.created_at|date:'d.m.y H:i' }}</th>
+        <td>{{ parcel.to_customer.name }}</td>
+        <td>{{ parcel.from_customer.phone }}</td>
+        <td>{{ parcel.to_customer.phone }}</td>
+        <td>{{ parcel.id }}</td>
+        <td>{{ parcel.payer.name }}</td>
+        <td>{{ parcel.payment_status }}</td>
+        <td>{{ parcel.ship_status }}</td>
+        <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
+        <td>{{ parcel.created_by.name }}</td>
+        <td>{{ parcel.delivered_by.name }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+    {% include 'inc/_pagination.html' %}
+  {% else %}
+  <p>Посылок нет</p>
+  {% endif %}
+
+
+
 {% endblock %}

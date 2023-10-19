@@ -41,6 +41,7 @@ class Customer(CustomStr, models.Model):
     class Meta:
         verbose_name = 'Клиент'
         verbose_name_plural = 'Клиенты'
+        unique_together = ['name', 'phone']
 
 
 class CashCollection(CustomStr, models.Model):
@@ -79,7 +80,7 @@ class Parcel(CustomStr, models.Model):
     created_by = models.ForeignKey(User, verbose_name='Принял посылку', on_delete=models.PROTECT,
                                    related_name='parcels_created')
     delivered_by = models.ForeignKey(User, verbose_name='Выдал посылку', on_delete=models.PROTECT,
-                                     related_name='parcels_delivered')
+                                     related_name='parcels_delivered', blank=True, null=True)
     complete_date = models.DateTimeField(verbose_name='Дата вручения', blank=True, null=True)
 
     class Meta:
@@ -94,7 +95,7 @@ class Transaction(CustomStr, models.Model):
     date_time = models.DateTimeField(verbose_name='Дата и время оплаты')
     cash_collected = models.BooleanField(default=False, verbose_name='Инкассация произведена')
     cash_collection = models.ForeignKey(CashCollection, verbose_name='Инкассация', on_delete=models.CASCADE,
-                                        related_name='transactions')
+                                        related_name='transactions', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Транзакция'
