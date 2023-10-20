@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div class="text-center">
+  <h1>Бухгалтерия</h1>
+</div>
+<div class="accounting-block">
+  <div class="total-block">
+    <div class="total-header">Общий баланс</div>
+    <div class="total-balance">{{ total_balance }} ₽</div>
+  </div>
+  {% for office in offices %}
+  <div class="office-block">
+    <div class="office-header">{{ office.office.name }}</div>
+    <div class="total-balance">{{ office.balance }} ₽</div>
+    <a type="button" class="btn btn-primary cash-collection-button btn-sm" id="cash-collection-button" data-object-id="{{ office.office.id }}" data-bs-toggle="modal" data-bs-target="#cashCollectionModal">Сделать инкассацию</a>
+  </div>
+  {% endfor %}
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="cashCollectionModal" tabindex="-1" aria-labelledby="cashCollectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="cashCollectionModalLabel">Новая инкассация</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="cash-collection-form" method="POST" action="{% url 'create_cash_collection' %}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сделать инкассацию</button>
+          <script>
+              const allOffices = document.querySelectorAll('.cash-collection-button')
+
+              allOffices.forEach((button) => {
+                  button.addEventListener('click', function() {
+                  // Здесь установите значение скрытого поля в зависимости от действия пользователя
+                  document.querySelector("#id_office").value = button.getAttribute('data-object-id');
+                  console.log('Подставлено')
+                  console.log(button.getAttribute('data-object-id'))
+                  // Здесь можно добавить логику для открытия всплывающего окна
+                 // document.querySelector("#cash-collection-form").submit();  // Автоматическая отправка формы
+              })
+              })
+
+          </script>
+          <script type="text/javascript">
+              $('#cash-collection-form').submit(function(e){
+                  e.preventDefault();
+                  $('#cash-collection-form small').remove();
+                  $form = $(this)
+                  const formData = new FormData(this);
+                  $.ajax({
+                      url: '{% url "create_cash_collection" %}',
+                      type: 'POST',
+                      data: formData,
+                      success: function (response) {
+                          $('.error').remove();
+                          console.log(response)
+                          if(response.error){
+                              alert(response.message)
+                              $.each(response.errors, function(name, error){
+                                  error = '<small class="text-muted error">' + error + '</small>'
+                                  $form.find('[name=' + name + ']').after(error);
+                              })
+                          }
+                          else{
+                              alert(response.message)
+                              location.reload();
+                          }
+                          // $('#create_new_parcel #id_phone').val('');
+                      },
+                      cache: false,
+                      contentType: false,
+                      processData: false
+                  });
+              });
+              // end
+          </script>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

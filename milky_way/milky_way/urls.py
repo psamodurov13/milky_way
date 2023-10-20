@@ -20,5 +20,6 @@ admin.site.site_header = 'Milky Way Administration'
 
 urlpatterns = [
     path('', include('logistic.urls')),
+    path('employees/', include('users.urls')),
     path('admin/', admin.site.urls),
 ]

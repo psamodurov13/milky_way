@@ -32,11 +32,32 @@
 
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
             <li>
-              <a href="{% url 'logout' %}" class="nav-link text-black text-center">
+              <a href="{% url 'index' %}" class="nav-link text-black text-center">
                 <i class="fa-solid fa-house d-block mx-auto mb-1" style="color: #000000;" ></i>
                 <div class="d-block mx-auto mb-1">Главная</div>
               </a>
             </li>
+            {% if request.user.is_superuser %}
+            <li>
+              <a href="{% url 'employees' %}" class="nav-link text-black text-center">
+                <i class="fa-regular fa-user d-block mx-auto mb-1" style="color: #000000;" ></i>
+                <div class="d-block mx-auto mb-1">Сотрудники</div>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'accounting' %}" class="nav-link text-black text-center">
+                <i class="fa-solid fa-receipt d-block mx-auto mb-1" style="color: #000000;" ></i>
+                <div class="d-block mx-auto mb-1">Бухгалтерия</div>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'reports' %}" class="nav-link text-black text-center">
+                <i class="fa-solid fa-table d-block mx-auto mb-1" style="color: #000000;" ></i>
+                <div class="d-block mx-auto mb-1">Отчеты</div>
+              </a>
+            </li>
+            {% endif %}
+
             <li>
               <a href="{% url 'logout' %}" class="nav-link text-black text-center">
                 <i class="fa-solid fa-arrow-right-from-bracket d-block mx-auto mb-1" style="color: #000000;" ></i>

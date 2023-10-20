@@ -6,23 +6,19 @@
 <div class="text-center">
   <h1>{{ title }}</h1>
 </div>
-<div class="admin-menu">
-  <a href="{% url 'employees' %}">Сотрудники</a>
-  <a href="{% url 'accounting' %}">Бухгалтерия</a>
-  <a href="{% url 'reports' %}">Отчеты</a>
-</div>
 <div class="user-office-block">
+  <div class="routes">
+    <div class="routes_list my-3">
+    {% for route in routes %}
+      <a href="{% url 'change_route' route.from_city.id route.to_city.id %}" type="button" class="btn btn-primary btn-sm {% if request.session.route.from_id == route.from_city.id and request.session.route.to_id == route.to_city.id %}active-route{% endif %}" id="{{ route.from_city.id }}to{{ route.to_city.id }}" >{{ route.name }}</a>
+    {% endfor %}
+    </div>
+  </div>
   <div class="office-balance">
-    <div class="balance">Баланс: </div>
+    <div class="balance">Баланс: {{ balance }}</div>
   </div>
 </div>
-<div class="routes">
-  <div class="routes_list my-3">
-  {% for route in routes %}
-    <a href="{% url 'change_route' route.from_city.id route.to_city.id %}" type="button" class="btn btn-primary btn-sm" id="{{ route.from_city.id }}to{{ route.to_city.id }}" >{{ route.name }}</a>
-  {% endfor %}
-  </div>
-</div>
+
 
   <form id="search-form" method="GET" action="{% url 'index' %}">
     {{ search_form|crispy }}
@@ -57,8 +53,8 @@
         <td>{{ parcel.payment_status }}</td>
         <td>{{ parcel.ship_status }}</td>
         <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
-        <td>{{ parcel.created_by.name }}</td>
-        <td>{{ parcel.delivered_by.name }}</td>
+        <td>{{ parcel.created_by.first_name }}</td>
+        <td>{{ parcel.delivered_by.first_name }}</td>
       </tr>
     {% endfor %}
     </tbody>

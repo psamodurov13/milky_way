@@ -2,6 +2,7 @@ from django.db import models
 from milky_way.utils import CustomStr
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
+from milky_way.settings import logger
 User = get_user_model()
 
 
@@ -92,7 +93,7 @@ class Transaction(CustomStr, models.Model):
     parcel = models.ForeignKey(Parcel, verbose_name='Посылка', on_delete=models.CASCADE, related_name='transactions')
     amount = models.FloatField(verbose_name='Полученная сумма')
     office = models.ForeignKey(Office, verbose_name='Офис', on_delete=models.CASCADE, related_name='transactions')
-    date_time = models.DateTimeField(verbose_name='Дата и время оплаты')
+    date_time = models.DateTimeField(verbose_name='Дата и время оплаты', auto_now_add=True)
     cash_collected = models.BooleanField(default=False, verbose_name='Инкассация произведена')
     cash_collection = models.ForeignKey(CashCollection, verbose_name='Инкассация', on_delete=models.CASCADE,
                                         related_name='transactions', blank=True, null=True)

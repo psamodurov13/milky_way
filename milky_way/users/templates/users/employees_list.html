@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div class="text-center">
+  <h1>Сотрудники</h1>
+</div>
+<div class="employees-list">
+  <a type="button" class="btn btn-primary new-parcel-button" id="new-user" data-bs-toggle="modal" data-bs-target="#newUserModal">Добавить пользователя</a>
+  <table class="table table-success table-striped my-3">
+    <thead>
+      <tr>
+        <th scope="col">ФИО</th>
+        <th scope="col">Телефон</th>
+        <th scope="col">Офис</th>
+        <th scope="col">Город</th>
+        <th scope="col">Логин</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for employee in employees %}
+      <tr>
+        <th>{{ employee.last_name  }} {{ employee.first_name }} {{ employee.second_name }} <a href="{% url 'edit_user' employee.id %}"><i class="fa-solid fa-user-pen"></i></a> <a href="{% url 'change_password' employee.id %}"><i class="fa-solid fa-key"></i></a> <a href="{% url 'delete_user' employee.id %}"><i class="fa-solid fa-trash"></i></a></th>
+        <td>{{ employee.phone }}</td>
+        <td>{{ employee.office }}</td>
+        <td>{{ employee.office.city }}</td>
+        <td>{{ employee.username }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="newUserModal" tabindex="-1" aria-labelledby="newUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="newUserModalLabel">Новый пользователь</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="new-user-form" method="POST" >
+          {% csrf_token %}
+          {{ form|crispy }}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Создать пользователя</button>
+
+          <script type="text/javascript">
+              $('#new-user-form').submit(function(e){
+                  console.log('function started');
+                  e.preventDefault();
+                  $('#new-user-form small').remove();
+                  $form = $(this)
+                  const formData = new FormData(this);
+                  console.log(formData);
+                  $.ajax({
+                      url: '{% url "employees" %}',
+                      type: 'POST',
+                      data: formData,
+                      success: function (response) {
+                          $('.error').remove();
+                          console.log(response)
+                          if(response.error){
+                              alert(response.message)
+                              $.each(response.errors, function(name, error){
+                                  error = '<small class="text-muted error">' + error + '</small>'
+                                  $form.find('[name=' + name + ']').after(error);
+                              })
+                          }
+                          else{
+                              alert(response.message)
+                              location.reload();
+                          }
+                      },
+                      cache: false,
+                      contentType: false,
+                      processData: false
+                  });
+              });
+              // end
+          </script>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

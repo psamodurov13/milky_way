@@ -3,17 +3,7 @@
 {% load crispy_forms_filters %}
 
 {% block content %}
-<script src=
-"https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
-</script>
 
-<script src=
-"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
-</script>
-
-<link href=
-"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
-rel="stylesheet" type="text/css" />
 
 
 <div class="text-center">
@@ -25,23 +15,30 @@ rel="stylesheet" type="text/css" />
     <div class="user-office">{{ user.office.name }}</div>
   </div>
   <div class="office-balance">
-    <div class="balance">Баланс: </div>
+    <div class="balance">Баланс: {{ balance }}</div>
   </div>
 </div>
 <div class="routes">
   <div class="routes_list my-3">
   {% for route in routes %}
-    <button type="button" class="btn btn-primary btn-sm" id="{{ route.from_city.id }}to{{ route.to_city.id }}" >{{ route.name }}</button>
+    <a href="{% url 'change_route' route.from_city.id route.to_city.id %}" type="button" class="btn btn-primary btn-sm {% if request.session.route.from_id == route.from_city.id and request.session.route.to_id == route.to_city.id %}active-route{% endif %}" id="{{ route.from_city.id }}to{{ route.to_city.id }}" >{{ route.name }}</a>
   {% endfor %}
   </div>
 </div>
+<div class="choice-way-block my-3">
+    <a href="{% url 'change_way' 'sent' %}" class="{% if way == 'sent' %}active-button{% else %}inactive-button{% endif %}" id="sent-button">Отправлено</a>
+    <a href="{% url 'change_way' 'received' %}" class="{% if way == 'received' %}active-button{% else %}inactive-button{% endif %}" id="received-button">Получено</a>
+</div>
 
   <form id="search-form" method="GET" action="{% url 'index' %}">
-          {{ search_form|crispy }}
-          <button type="submit" class="btn btn-primary ms-3 mb-3">Поиск</button>
+      {{ search_form|crispy }}
+      <button type="submit" class="btn btn-primary ms-3 mb-3">Поиск</button>
   </form>
-
+  {% if way == 'sent' %}
   <a type="button" class="btn btn-primary new-parcel-button" id="new-parcel-button" data-bs-toggle="modal" data-bs-target="#newParcelModal">Новая посылка</a>
+  {% elif way == 'received' %}
+  <a href="{% url 'receive_to_office' %}" type="button" class="btn btn-primary new-parcel-button" id="received-to-office-button">Получить посылки</a>
+  {% endif %}
   {% if page_obj %}
   <table class="table table-success table-striped my-3">
     <thead>
@@ -68,7 +65,14 @@ rel="stylesheet" type="text/css" />
         <td>{{ parcel.payer.name }}</td>
         <td>{{ parcel.payment_status }}</td>
         <td>{{ parcel.ship_status }}</td>
-        <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
+        <td>
+          {% if parcel.ship_status.id == 2 %}
+          {{ parcel.complete_date|date:'d.m.y H:m' }}
+          {% elif parcel.ship_status.id == 1 %}
+<!--          <a href="{% url 'deliver_parcel' parcel.id %}" type="button" class="btn btn-primary deliver-parcel-button btn-sm">Выдать</a>-->
+          <a type="button" class="btn btn-primary deliver-parcel-button btn-sm" id="deliver-parcel-button" data-object-id="{{ parcel.id }}" data-bs-toggle="modal" data-bs-target="#deliverParcelModal">Выдать</a>
+          {% endif %}
+        </td>
       </tr>
     {% endfor %}
     </tbody>
@@ -171,6 +175,43 @@ rel="stylesheet" type="text/css" />
               // end
           </script>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="deliverParcelModal" tabindex="-1" aria-labelledby="deliverParcelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deliverParcelModalLabel">Выдать посылку</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-content">
+        </div>
+
+
+
+
+        <script>
+        $(document).ready(function() {
+          $(".deliver-parcel-button").click(function() {
+            const objectId = $(this).data("object-id");
+            $.ajax({
+              url: '/get_object_info/',
+              type: 'GET',
+              data: { object_id: objectId },
+              success: function(data) {
+                $('.modal-body').html(data.html_response);
+              }
+            });
+          });
+        });
+        </script>
+
+
       </div>
     </div>
   </div>

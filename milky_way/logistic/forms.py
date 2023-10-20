@@ -4,9 +4,10 @@ from django.core.exceptions import ValidationError
 from milky_way.settings import logger
 from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
+from .utils import get_balance
 
 
-from .models import Parcel, Customer, Office, Payer
+from .models import Parcel, Customer, Office, Payer, CashCollection
 from users.models import User
 
 
@@ -40,4 +41,22 @@ class NewParcelForm(forms.Form):
 
 
 class SearchParcelsForm(forms.Form):
-    search = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Поиск'}))
+    search = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Поиск'}), required=False)
+
+
+class CashCollectionForm(forms.ModelForm):
+    class Meta:
+        model = CashCollection
+        fields = ['amount', 'office']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        amount = cleaned_data.get("amount")
+        current_balance = get_balance(cleaned_data.get('office'))
+        logger.info(f'AMOUNT - {amount}, CURRENT AMOUNT - {current_balance}')
+
+        errors = {}
+        if amount > current_balance:
+            errors['amount'] = ValidationError(f"Сумма не может быть больше текущей суммы в кассе ({current_balance})")
+        if errors:
+            raise ValidationError(errors)

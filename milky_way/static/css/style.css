@@ -22,3 +22,52 @@ margin-bottom: 100px;
 form small.error {
 color: red !important;
 }
+
+#search-form {
+display: flex;
+}
+#search-form #div_id_search {
+display: flex;
+width: 100%;
+}
+#search-form button {
+display: flex;
+}
+
+.active-button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.inactive-button {
+    background-color: #ccc;
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.active-button:focus,
+.inactive-button:focus {
+    outline: none;
+}
+
+.active-button:active,
+.inactive-button:active {
+    transform: translateY(2px);
+}
+
+#sent-button.active-button {
+    background-color: #27ae60;
+}
+
+#received-button.active-button {
+    background-color: #e74c3c;
+}
