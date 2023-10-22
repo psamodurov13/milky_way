@@ -7,17 +7,27 @@
   <h1>Бухгалтерия</h1>
 </div>
 <div class="accounting-block">
-  <div class="total-block">
-    <div class="total-header">Общий баланс</div>
-    <div class="total-balance">{{ total_balance }} ₽</div>
+  <div class="row my-4 total-block">
+    <div class="col-sm-12 col-md-6">
+      <div class="total-header">Общий баланс</div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+      <div class="total-balance">{{ total_balance }} ₽</div>
+    </div>
   </div>
+  <div class="row row-cols-1 row-cols-md-2">
   {% for office in offices %}
-  <div class="office-block">
-    <div class="office-header">{{ office.office.name }}</div>
-    <div class="total-balance">{{ office.balance }} ₽</div>
-    <a type="button" class="btn btn-primary cash-collection-button btn-sm" id="cash-collection-button" data-object-id="{{ office.office.id }}" data-bs-toggle="modal" data-bs-target="#cashCollectionModal">Сделать инкассацию</a>
+  <div class="col">
+    <div class="office-block">
+      <div class="d-flex justify-content-between align-items-center">
+      <div class="office-header">{{ office.office.name }}</div>
+      <div class="total-balance">{{ office.balance }} ₽</div>
+      </div>
+      <a type="button" class="btn btn-primary cash-collection-button btn-sm d-block mt-3" id="cash-collection-button" data-object-id="{{ office.office.id }}" data-bs-toggle="modal" data-bs-target="#cashCollectionModal">Сделать инкассацию</a>
+    </div>
   </div>
   {% endfor %}
+  </div>
 </div>
 
 

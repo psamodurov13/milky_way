@@ -8,7 +8,7 @@
 </div>
 <div class="employees-list">
   <a type="button" class="btn btn-primary new-parcel-button" id="new-user" data-bs-toggle="modal" data-bs-target="#newUserModal">Добавить пользователя</a>
-  <table class="table table-success table-striped my-3">
+  <table class="table table-hover custom-table my-3">
     <thead>
       <tr>
         <th scope="col">ФИО</th>
@@ -21,7 +21,7 @@
     <tbody>
     {% for employee in employees %}
       <tr>
-        <th>{{ employee.last_name  }} {{ employee.first_name }} {{ employee.second_name }} <a href="{% url 'edit_user' employee.id %}"><i class="fa-solid fa-user-pen"></i></a> <a href="{% url 'change_password' employee.id %}"><i class="fa-solid fa-key"></i></a> <a href="{% url 'delete_user' employee.id %}"><i class="fa-solid fa-trash"></i></a></th>
+        <th>{{ employee.last_name  }} {{ employee.first_name }} {{ employee.second_name }} <a href="{% url 'edit_user' employee.id %}" title="Редактировать"><i class="fa-solid fa-user-pen"></i></a> <a href="{% url 'change_password' employee.id %}" title="Изменить пароль"><i class="fa-solid fa-key"></i></a> <a href="{% url 'delete_user' employee.id %}" title="Удалить"><i class="fa-solid fa-trash"></i></a></th>
         <td>{{ employee.phone }}</td>
         <td>{{ employee.office }}</td>
         <td>{{ employee.office.city }}</td>
@@ -46,8 +46,8 @@
         <form id="new-user-form" method="POST" >
           {% csrf_token %}
           {{ form|crispy }}
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          <button type="submit" class="btn btn-primary">Создать пользователя</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary btn-sm">Создать пользователя</button>
 
           <script type="text/javascript">
               $('#new-user-form').submit(function(e){

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div class="text-center">
+  <h1>Отчеты</h1>
+</div>
+
+  <form id="reports-form" method="POST" >
+      {% csrf_token %}
+      <div class="row">
+          <div class="col-sm-12 col-md-6">
+            {{ form.start_date|as_crispy_field }}
+          </div>
+          <div class="col-sm-12 col-md-6">
+            {{ form.end_date|as_crispy_field }}
+          </div>
+      </div>
+
+      {{ form.routes|as_crispy_field }}
+
+        <script>
+          $(function () {
+            $(".datetimepicker").datetimepicker({
+              format: 'd.m.Y',
+                timepicker: false,
+                scrollMonth : false,
+                scrollDay: false,
+                scrollYear: false,
+                scrollInput : false
+            });
+            $.datetimepicker.setLocale('ru');
+          });
+        </script>
+      <button type="submit" class="btn btn-primary mb-3" name="send-button">Отправить</button>
+  </form>
+
+<div class="report-data row">
+    <div class="col-sm-12 col-md-6">
+    <div class="report-parcels">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="total_header">Всего посылок</div>
+            <div class="total_value">{{ report.parcels.total }}</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="parameter_header">Доставлено</div>
+            <div class="parameter_value">{{ report.parcels.delivered }}</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="parameter_header">В доставке</div>
+            <div class="parameter_value">{{ report.parcels.in_process }}</div>
+        </div>
+    </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+    <div class="report-amounts">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="total_header">Общая сумма</div>
+            <div class="total_value">{{ report.amounts.total }}</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="parameter_header">Оплачено</div>
+            <div class="parameter_value">{{ report.amounts.paid }}</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="parameter_header">Не оплачено</div>
+            <div class="parameter_value">{{ report.amounts.not_paid }}</div>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

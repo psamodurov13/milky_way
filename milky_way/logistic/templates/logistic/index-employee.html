@@ -9,13 +9,13 @@
 <div class="text-center">
   <h1>{{ title }}</h1>
 </div>
-<div class="user-office-block">
+<div class="user-office-block my-3">
   <div class="user-info">
     <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
     <div class="user-office">{{ user.office.name }}</div>
   </div>
   <div class="office-balance">
-    <div class="balance">Баланс: {{ balance }}</div>
+    <div class="balance">Баланс: <br><span class="digits">{{ balance }} ₽</span></div>
   </div>
 </div>
 <div class="routes">
@@ -40,7 +40,7 @@
   <a href="{% url 'receive_to_office' %}" type="button" class="btn btn-primary new-parcel-button" id="received-to-office-button">Получить посылки</a>
   {% endif %}
   {% if page_obj %}
-  <table class="table table-success table-striped my-3">
+  <table class="table table-hover custom-table my-3">
     <thead>
       <tr>
         <th scope="col">Дата оформления</th>
@@ -62,13 +62,25 @@
         <td>{{ parcel.from_customer.phone }}</td>
         <td>{{ parcel.to_customer.phone }}</td>
         <td>{{ parcel.id }}</td>
-        <td>{{ parcel.payer.name }}</td>
-        <td>{{ parcel.payment_status }}</td>
-        <td>{{ parcel.ship_status }}</td>
+        {% if parcel.payer.name == 'Отправитель' %}
+        <td class="green">Отправитель</td>
+        {% else %}
+        <td class="red">Получатель</td>
+        {% endif %}
+        {% if parcel.payment_status %}
+        <td class="green">Оплачено</td>
+        {% else %}
+        <td class="red">Не оплачено</td>
+        {% endif %}
+        {% if parcel.ship_status.id == 2 %}
+        <td class="green">{{ parcel.ship_status.name }}</td>
+        {% else %}
+        <td class="red">{{ parcel.ship_status.name }}</td>
+        {% endif %}
         <td>
           {% if parcel.ship_status.id == 2 %}
           {{ parcel.complete_date|date:'d.m.y H:m' }}
-          {% elif parcel.ship_status.id == 1 %}
+          {% elif parcel.ship_status.id == 1 and way == 'received' %}
 <!--          <a href="{% url 'deliver_parcel' parcel.id %}" type="button" class="btn btn-primary deliver-parcel-button btn-sm">Выдать</a>-->
           <a type="button" class="btn btn-primary deliver-parcel-button btn-sm" id="deliver-parcel-button" data-object-id="{{ parcel.id }}" data-bs-toggle="modal" data-bs-target="#deliverParcelModal">Выдать</a>
           {% endif %}
@@ -79,7 +91,9 @@
   </table>
     {% include 'inc/_pagination.html' %}
   {% else %}
+  <div class="my-3">
   <p>Посылок нет</p>
+  </div>
   {% endif %}
 
 
@@ -96,12 +110,20 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="new-parcel-form" method="POST" action="{% url 'create_new_parcel' %}">
+        <form id="new-parcel-form" method="post" action="{% url 'create_new_parcel' %}">
           {% csrf_token %}
           {{ new_parcel_form|crispy }}
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          <button type="submit" class="btn btn-primary">Создать посылку</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary btn-sm" name="action" value="send-button">Создать посылку</button>
+          <button type="submit" class="btn btn-primary btn-sm" name="action" value="send-print-button">Создать посылку и распечатать</button>
+          <input type="hidden" name="button-clicked" id="button-clicked" value="">
 
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
           <script>
           $( function() {
             var availableTags = [
@@ -142,11 +164,18 @@
               })
           </script>
           <script type="text/javascript">
+              $("#new-parcel-form button").on("click", function() {
+                  const buttonValue = $(this).attr("value");
+                  $("#button-clicked").val(buttonValue);
+              });
+
+
               $('#new-parcel-form').submit(function(e){
                   e.preventDefault();
                   $('#new-parcel-form small').remove();
                   $form = $(this)
                   const formData = new FormData(this);
+
                   $.ajax({
                       url: '{% url "create_new_parcel" %}',
                       type: 'POST',
@@ -163,9 +192,12 @@
                           }
                           else{
                               alert(response.message)
+                              if (response.barcode) {
+                                window.open(response.barcode, '_blank').print();
+                              }
                               location.reload();
+
                           }
-                          // $('#create_new_parcel #id_phone').val('');
                       },
                       cache: false,
                       contentType: false,
@@ -174,11 +206,6 @@
               });
               // end
           </script>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Modal -->
 <div class="modal fade" id="deliverParcelModal" tabindex="-1" aria-labelledby="deliverParcelModalLabel" aria-hidden="true">

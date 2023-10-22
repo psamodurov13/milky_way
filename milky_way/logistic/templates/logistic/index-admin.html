@@ -6,7 +6,7 @@
 <div class="text-center">
   <h1>{{ title }}</h1>
 </div>
-<div class="user-office-block">
+<div class="user-office-block my-3">
   <div class="routes">
     <div class="routes_list my-3">
     {% for route in routes %}
@@ -15,7 +15,7 @@
     </div>
   </div>
   <div class="office-balance">
-    <div class="balance">Баланс: {{ balance }}</div>
+    <div class="balance">Баланс: <br><span class="digits">{{ balance }} ₽</span></div>
   </div>
 </div>
 
@@ -25,7 +25,7 @@
     <button type="submit" class="btn btn-primary ms-3 mb-3">Поиск</button>
   </form>
   {% if page_obj %}
-  <table class="table table-success table-striped my-3">
+  <table class="table table-hover custom-table my-3">
     <thead>
       <tr>
         <th scope="col">Дата оформления</th>
@@ -49,9 +49,21 @@
         <td>{{ parcel.from_customer.phone }}</td>
         <td>{{ parcel.to_customer.phone }}</td>
         <td>{{ parcel.id }}</td>
-        <td>{{ parcel.payer.name }}</td>
-        <td>{{ parcel.payment_status }}</td>
-        <td>{{ parcel.ship_status }}</td>
+        {% if parcel.payer.name == 'Отправитель' %}
+        <td class="green">Отправитель</td>
+        {% else %}
+        <td class="red">Получатель</td>
+        {% endif %}
+        {% if parcel.payment_status %}
+        <td class="green">Оплачено</td>
+        {% else %}
+        <td class="red">Не оплачено</td>
+        {% endif %}
+        {% if parcel.ship_status.id == 2 %}
+        <td class="green">{{ parcel.ship_status.name }}</td>
+        {% else %}
+        <td class="red">{{ parcel.ship_status.name }}</td>
+        {% endif %}
         <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
         <td>{{ parcel.created_by.first_name }}</td>
         <td>{{ parcel.delivered_by.first_name }}</td>

@@ -1,3 +1,63 @@
+:root {
+--gray-background: #f6f7fa:
+}
+@font-face {
+	font-family: 'Mulish';
+	src: url(/static/fonts/Mulish/Mulish-VariableFont_wght.ttf);
+}
+body {
+font-family: 'Mulish';
+}
+body {
+  background: url('video.png');
+  background-size: cover;
+}
+h1 {
+text-align: left;
+margin-bottom: 20px;
+}
+.login-page h1 {
+text-align: center;
+}
+
+.bgvideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -9999;
+}
+.user-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.user-office {
+    font-size: 1.2rem;
+}
+span.digits {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #0d6efd;
+}
+.btn-primary {
+    background: #60b860;
+    border: 1px solid #60b860;
+}
+.btn-primary:hover {
+    background: #60b860;
+    opacity: 0.75;
+    border: 1px solid #60b860;
+}
+.green {
+    color: #60b860 !important;
+}
+.red {
+color: red !important;
+}
+
 .logo {
 width: 65px;
 }
@@ -47,8 +107,8 @@ display: flex;
 }
 
 .inactive-button {
-    background-color: #ccc;
-    color: #333;
+    background-color: #f6f7fa;
+    color: #7a7979;
     padding: 2px 20px;
     border: none;
     border-radius: 5px;
@@ -63,22 +123,42 @@ display: flex;
     outline: none;
 }
 
+.inactive-button:hover {
+    background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+}
+
 .active-button:active,
 .inactive-button:active {
     transform: translateY(2px);
 }
 
 #sent-button.active-button {
-    background-color: #27ae60;
+    background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
 }
 
 #received-button.active-button {
-    background-color: #e74c3c;
+    background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
 }
-
-.active-route {
-    background: #7bb17b;
+.routes_list .btn-primary {
+    background-color: #f6f7fa;
+    color: #7a7979;
     border: none;
+}
+.routes_list .btn-primary:hover {
+    background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+}
+.routes_list .btn-primary.active-route {
+    background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
 }
 
 .user-office-block {
@@ -86,3 +166,173 @@ display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
+.custom-table td, .custom-table th {
+background-color: #f6f7fa !important;
+color: #7a7979;
+font-size: 0.8rem;
+}
+.custom-table th {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.custom-table thead {
+border-bottom: 3px white solid;
+}
+.custom-table tr {
+border-bottom: 1px solid #eeeeee;
+vertical-align: middle;
+}
+.custom-table tr th:first-child {
+border-right: 3px white solid;
+}
+.alert {
+padding: 10px;
+opacity: 0.8;
+}
+
+.login-page {
+color: white !important;
+}
+.login-form .form-control {
+    color: white;
+    background-color: #54545491;
+    border-color: #54545491;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem #54545491;
+}
+.login-form .form-control:focus {
+    color: white;
+    background-color: #54545491;
+    border-color: #54545491;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem #54545491;
+}
+.login-page .btn-primary {
+    background: transparent;
+    border: 1px solid white;
+}
+.login-page .btn-primary:hover {
+    background: white;
+    border: 1px solid white;
+    color: black;
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
+border: 1px solid #e3f5ff !important;
+background: #e3f5ff url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x !important;
+font-weight: bold !important;
+color: #0d6efd !important;
+}
+
+.ui-widget-header {
+border: 1px solid #e3f5ff !important;
+background: #e3f5ff url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x !important;
+color: #ffffff !important;
+font-weight: bold !important;
+}
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {
+border: 1px solid #e3f5ff !important;
+background: #e3f5ff url(images/ui-bg_highlight-soft_75_ffe45c_1x100.png) 50% top repeat-x !important;
+color: #e3f5ff !important;
+}
+
+.custom-table a i {
+color: #60b860;
+margin: 0 3px;
+}
+.custom-table a:hover {
+opacity: 0.75;
+}
+
+.total-block {
+    display: flex;
+    font-size: 4rem;
+}
+.total-block .total-header, .total-block .total-balance, .report-parcels, .report-amounts {
+    background: #f6f7fa;
+    padding: 30px;
+}
+.total-block .total-balance {
+text-align: right;
+color: #0d6efd;
+}
+.office-block {
+padding: 20px 30px;
+background: #f6f7fa;
+}
+.office-block .total-balance {
+    font-size: 2rem;
+}
+.office-block .office-header {
+font-size: 1.5rem;
+}
+#div_id_routes input[type="radio"] {
+    display: none;
+}
+#div_id_routes .form-check {
+    display: inline-block;
+    padding-right: 16px;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+/* Общий стиль для радиокнопок */
+#div_id_routes {
+  display: block; /* Располагаем радиокнопки в одну строку */
+}
+
+/* Стиль для скрытия настоящих радиокнопок */
+#div_id_routes input[type="radio"] {
+  display: none;
+}
+
+/* Стиль для кастомизированных радиокнопок (обычные кнопки) */
+#div_id_routes > div label {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 5px;
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    background-color: #f6f7fa;
+    color: #7a7979;
+    border: none;
+}
+#div_id_routes > div {
+margin: 0 !important;
+}
+#div_id_routes .form-check {
+    display: inline-block;
+    padding-right: 16px;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+/* Стиль для активных радиокнопок */
+#div_id_routes input[type="radio"]:checked + label {
+  background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+}
+.report-data .parameter_header, .report-data .total_header {
+    font-size: 1.5rem;
+}
+.report-data .total_value, .report-data .parameter_value {
+    font-size: 3rem;
+}
+.report-data .total_value {
+font-weight: 800;
+color: #0d6efd;
+}
+
+.active>.page-link, .page-link.active {
+    z-index: 3;
+    background-color: #e3f5ff;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+}
+
+
+

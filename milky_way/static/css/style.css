@@ -1,3 +1,7 @@
+:root {
+--gray-background: #f6f7fa:
+}
+
 .logo {
 width: 65px;
 }
@@ -37,21 +41,25 @@ display: flex;
 .active-button {
     background-color: #3498db;
     color: #fff;
-    padding: 10px 20px;
+    padding: 2px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-right: 10px;
+    text-decoration: none;
+        font-size: 14px;
 }
 
 .inactive-button {
     background-color: #ccc;
     color: #333;
-    padding: 10px 20px;
+    padding: 2px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-right: 10px;
+    text-decoration: none;
+        font-size: 14px;
 }
 
 .active-button:focus,
@@ -70,4 +78,19 @@ display: flex;
 
 #received-button.active-button {
     background-color: #e74c3c;
+}
+
+.active-route {
+    background: #7bb17b;
+    border: none;
+}
+
+.user-office-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-table td {
+background-color: var(--gray-background) !important;
 }

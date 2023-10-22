@@ -4,6 +4,10 @@
 {% load static %}
 
 {% block content %}
+<div class="login-page">
+<video autoplay loop muted class="bgvideo" id="bgvideo">
+   <source src="{% static 'video/background.mp4' %}" type="video/mp4"></source>
+</video>
 <div class="text-center">
   <div class="header-block">
     <a href="/" class="logo-link text-center">
@@ -17,5 +21,6 @@
     {{ form|crispy }}
     <button type="submit" class="btn btn-primary" name="login-button">Войти</button>
   </form>
+</div>
 </div>
 {% endblock %}

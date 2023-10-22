@@ -87,6 +87,7 @@ class Parcel(CustomStr, models.Model):
     class Meta:
         verbose_name = 'Посылка'
         verbose_name_plural = 'Посылки'
+        ordering = ['-id']
 
 
 class Transaction(CustomStr, models.Model):
