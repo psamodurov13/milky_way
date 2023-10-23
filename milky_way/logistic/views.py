@@ -11,13 +11,10 @@ from milky_way.settings import logger
 from .models import *
 from django.db.models import Q
 from datetime import datetime, timedelta
-import barcode
+
 from barcode import generate
 from barcode.writer import ImageWriter
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from PIL import Image
+
 
 
 @login_required
@@ -78,7 +75,7 @@ def index(request):
         else:
             search_form = SearchParcelsForm()
             parcels = all_parcels
-        paginator = Paginator(parcels, 3)
+        paginator = Paginator(parcels, 20)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj
@@ -122,7 +119,7 @@ def index(request):
         else:
             search_form = SearchParcelsForm()
             parcels = all_parcels
-        paginator = Paginator(parcels, 3)
+        paginator = Paginator(parcels, 20)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj
@@ -138,19 +135,6 @@ def index(request):
         }
     return render(request, 'logistic/index.html', context)
 
-
-# contact_list = Women.objects.all()
-# paginator = Paginator(contact_list, 3)
-#
-# page_number = request.GET.get('page')
-# page_obj = paginator.get_page(page_number)
-#
-# return render(request, 'women/about.html', {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'})
-#
-#
-# {% for contact in page_obj %}
-# <p>{{ contact }}</p>
-# {% endfor %}
 
 def login_page(request):
     context = {}
@@ -222,7 +206,7 @@ def create_new_parcel(request):
                 price=form_data['price'],
                 created_by=request.user,
             )
-            if new_parcel.payer.name == 'Отправитель':
+            if new_parcel.payer.id == 1:
                 new_parcel.payment_status = True
                 new_parcel.save()
                 new_transaction = make_transaction(new_parcel)
@@ -333,15 +317,6 @@ def reports(request):
     context['form'] = form
     report_data = get_report(start_date, end_date, routes)
     logger.info(f'REPORT DATA - {report_data}')
-    # get_results_response = get_results(start_date, end_date, employees, products)
-    # if get_results_response:
-    #     head_row, results, final_row = get_results_response
-    # else:
-    #     messages.error(request, 'Заполните стоимость для всех категорий')
-    #     return redirect('products_catalog')
-    # context['head_row'] = head_row
-    # context['results'] = results
-    # context['final_row'] = final_row
     context['report'] = report_data
     return render(request, 'logistic/reports.html', context)
 
@@ -350,7 +325,6 @@ def change_route(request, from_city, to_city):
     # from_city, to_city = route_id.split('to')
     current_route = {'from_id': from_city, 'to_id': to_city}
     request.session['route'] = current_route
-    # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     return redirect('index')
 
 
@@ -374,12 +348,12 @@ def receive_to_office(request):
     for parcel in delivering_parcels:
         parcel.ship_status = ShipStatus.objects.get(id=1)
         parcel.save()
-        sms_text = f'''Ваша посылка доставлена в офис службы доставки "Млечный путь". Код для получения {parcel.id}'''
+        sms_text = f'''Ваша посылка доставлена в офис службы доставки "Млечный путь". Код-{parcel.id}. '''
         all_sms_tasks_to.append(send_sms(str(parcel.to_customer.phone), sms_text))
         all_sms_tasks_from.append(send_sms(str(parcel.from_customer.phone), sms_text))
     logger.info(f'SMS TO {all_sms_tasks_to}')
     logger.info(f'SMS FROM {all_sms_tasks_from}')
-    messages.success(request, f'Принято {len(delivering_parcels)} посылок')
+    messages.success(request, f'Принято посылок - {len(delivering_parcels)} ')
     logger.info(f'DELIVERING PARCELS - {delivering_parcels}')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -402,7 +376,7 @@ def send_to_office(request):
 
 def deliver_parcel(request, parcel_id):
     parcel = Parcel.objects.get(id=parcel_id)
-    if not parcel.payment_status and parcel.payer.name == 'Получатель':
+    if not parcel.payment_status and parcel.payer.id == 2:
         parcel.payment_status = True
         new_transaction = make_transaction(parcel)
         logger.info(f'NEW TRANSACTION - {new_transaction}')
@@ -458,18 +432,3 @@ def get_object_info(request):
     return JsonResponse({'html_response': html_response})
 
 
-
-
-
-
-# def send_form(request):
-#     if request.method == 'POST':
-#         form = ApplicationForm(request.POST, request=request)
-#         if form.is_valid():
-#             form_data = form.cleaned_data
-#             new_application = Application.objects.create(**form_data)
-#             print(f'NEW {new_application} - {new_application.__dict__}')
-#             new_application.save()
-#             return JsonResponse({'error': False, 'message': 'Заявка отправлена'})
-#         else:
-#             return JsonResponse({'error': True, 'errors': form.errors, 'message': 'Проверьте форму, телефон указан некорректно'})

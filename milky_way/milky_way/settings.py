@@ -111,7 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-TIME_ZONE = "Asia/Ho_Chi_Minh"
+# TIME_ZONE = "Asia/Ho_Chi_Minh"
+TIME_ZONE = "Europe/Moscow"
 LANGUAGE_CODE = "ru-ru"
 
 

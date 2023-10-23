@@ -44,8 +44,9 @@ class NewParcelForm(forms.Form):
     from_customer_phone = PhoneNumberField(label='Телефон отправителя', widget=forms.TextInput())
     to_customer = forms.CharField(label='Получатель', widget=forms.TextInput())
     to_customer_phone = PhoneNumberField(label='Телефон получателя', widget=forms.TextInput())
-    payer = forms.ChoiceField(label='Плательщик', choices=[(i.id, i.name) for i in Payer.objects.all()],
-                              widget=forms.RadioSelect())
+    if not migrations:
+        payer = forms.ChoiceField(label='Плательщик', choices=[(i.id, i.name) for i in Payer.objects.all()],
+                                  widget=forms.RadioSelect())
     price = forms.FloatField(label='Стоимость')
 
 
