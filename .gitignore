@@ -166,5 +166,7 @@ local_settings.py
 gunicorn.conf.py
 project.conf
 crypto_site.conf
+config/
+
 
 /media/
