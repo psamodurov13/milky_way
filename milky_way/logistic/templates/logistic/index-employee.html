@@ -36,6 +36,7 @@
   </form>
   {% if way == 'sent' %}
   <a type="button" class="btn btn-primary new-parcel-button" id="new-parcel-button" data-bs-toggle="modal" data-bs-target="#newParcelModal">Новая посылка</a>
+  <a href="{% url 'send_to_office' %}" type="button" class="btn btn-primary new-parcel-button" id="send-to-office-button">Отправить посылки</a>
   {% elif way == 'received' %}
   <a href="{% url 'receive_to_office' %}" type="button" class="btn btn-primary new-parcel-button" id="received-to-office-button">Получить посылки</a>
   {% endif %}
@@ -193,7 +194,21 @@
                           else{
                               alert(response.message)
                               if (response.barcode) {
-                                window.open(response.barcode, '_blank').print();
+                                const printWindow = window.open('', '_blank');
+                                // Вставляем HTML-контент в новое окно
+                                printWindow.document.open();
+                                printWindow.document.write(response.barcode);
+                                printWindow.print();
+                                // printWindow.document.close();
+
+                                // Ожидаем завершения загрузки ресурсов (например, изображений)
+                                printWindow.onload = function () {
+                                    // Запускаем процесс печати
+                                    printWindow.print();
+                                    // Закрываем новое окно после завершения печати (опционально)
+                                    printWindow.close();
+                                };
+                                // window.open(response.barcode, '_blank').print();
                               }
                               location.reload();
 

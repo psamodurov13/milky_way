@@ -12,6 +12,7 @@ urlpatterns = [
     path('reports', views.reports, name='reports'),
     path('change-route/<int:from_city>/<int:to_city>', views.change_route, name='change_route'),
     path('change-way/<str:way>', views.change_way, name='change_way'),
+    path('send-to-office/', views.send_to_office, name='send_to_office'),
     path('receive-to-office/', views.receive_to_office, name='receive_to_office'),
     path('deliver-parcel/<int:parcel_id>', views.deliver_parcel, name='deliver_parcel'),
     path('get_object_info/', views.get_object_info, name='get_object_info'),

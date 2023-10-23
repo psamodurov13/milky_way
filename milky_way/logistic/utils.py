@@ -3,6 +3,7 @@ from milky_way.settings import logger
 from datetime import datetime
 import requests as rq
 from milky_way.config import *
+from django.db.models import Q
 
 
 def make_transaction(parcel: Parcel):
@@ -63,10 +64,13 @@ def get_report(start_date: datetime, end_date: datetime, routes: list[dict]):
     logger.info(f'GET REPORT FROM OFFICES - {from_offices}')
     to_offices = Office.objects.filter(city__in=[i['to_city'] for i in routes])
     logger.info(f'GET REPORT TO OFFICES - {to_offices}')
+    logger.info(f'END DATE - {end_date}')
+    end_date = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=23, minute=59)
     parcels = Parcel.objects.filter(
+        (Q(created_at__gte=start_date) & Q(created_at__lte=end_date)),
         from_office__in=from_offices,
         to_office__in=to_offices,
-        created_at__range=[start_date, end_date]
+        # created_at__range=[start_date, end_date]
     )
     logger.info(f'PARCELS = {parcels}')
     results = {

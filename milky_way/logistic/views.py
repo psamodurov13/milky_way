@@ -218,7 +218,7 @@ def create_new_parcel(request):
                 to_office=City.objects.get(id=route['to_id']).offices.all()[0],
                 to_customer=to_customer,
                 payer=Payer.objects.get(id=int(form_data['payer'])),
-                ship_status=ShipStatus.objects.get(id=3),
+                ship_status=ShipStatus.objects.get(id=4),
                 price=form_data['price'],
                 created_by=request.user,
             )
@@ -232,7 +232,17 @@ def create_new_parcel(request):
             if 'send-print-button' in request.POST['button-clicked']:
                 logger.info(f'WITH PRINT')
                 barcode_file = generate('code128', str(new_parcel.id), writer=ImageWriter(), output=f'./media/barcode-{new_parcel.id}')
-                return JsonResponse({'error': False, 'message': 'Посылка создана', 'barcode': f"/media/barcode-{new_parcel.id}.png"})
+                text = f'''<p>{new_parcel.to_customer.name}</p>                       
+<p>{str(new_parcel.from_customer.phone)}</p>
+<p>{str(new_parcel.to_customer.phone)}</p>
+<p>Код: <b>{new_parcel.id}</b></p>
+<p>Стоимость: {new_parcel.price}</p>
+<p>Плательщик: {new_parcel.payer.name}</p>
+'''
+
+                return JsonResponse({'error': False, 'message': 'Посылка создана',
+                                     # 'barcode': f"/media/barcode-{new_parcel.id}.png",
+                                     'barcode': text})
             else:
                 logger.info(f'WITHOUT PRINT')
                 return JsonResponse({'error': False, 'message': 'Посылка создана', 'barcode': None})
@@ -364,13 +374,29 @@ def receive_to_office(request):
     for parcel in delivering_parcels:
         parcel.ship_status = ShipStatus.objects.get(id=1)
         parcel.save()
-        sms_text = f'''Ваша посылка доставлена в офис службы доставки "Млечный путь". Код {parcel.id}'''
+        sms_text = f'''Ваша посылка доставлена в офис службы доставки "Млечный путь". Код для получения {parcel.id}'''
         all_sms_tasks_to.append(send_sms(str(parcel.to_customer.phone), sms_text))
         all_sms_tasks_from.append(send_sms(str(parcel.from_customer.phone), sms_text))
     logger.info(f'SMS TO {all_sms_tasks_to}')
     logger.info(f'SMS FROM {all_sms_tasks_from}')
     messages.success(request, f'Принято {len(delivering_parcels)} посылок')
     logger.info(f'DELIVERING PARCELS - {delivering_parcels}')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def send_to_office(request):
+    logger.info(f'SEND TO OFFICE STARTED')
+    route = request.session['route']
+    parcels_for_send = Parcel.objects.filter(
+        from_office=City.objects.get(id=route['from_id']).offices.all()[0],
+        to_office=City.objects.get(id=route['to_id']).offices.all()[0],
+        ship_status=ShipStatus.objects.get(id=4),
+    )
+    for parcel in parcels_for_send:
+        parcel.ship_status = ShipStatus.objects.get(id=3)
+        parcel.save()
+    messages.success(request, f'Отправлено посылок - {len(parcels_for_send)} ')
+    logger.info(f'SENT PARCELS - {parcels_for_send}')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
