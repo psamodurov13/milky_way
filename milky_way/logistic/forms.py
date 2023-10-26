@@ -49,6 +49,13 @@ class NewParcelForm(forms.Form):
                                   widget=forms.RadioSelect())
     price = forms.FloatField(label='Стоимость')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['from_customer_phone'].widget.attrs['data-phone-pattern'] = "+7 (___) ___-__-__"
+        self.fields['from_customer_phone'].widget.attrs['placeholder'] = "+7 (___) ___-__-__"
+        self.fields['to_customer_phone'].widget.attrs['data-phone-pattern'] = "+7 (___) ___-__-__"
+        self.fields['to_customer_phone'].widget.attrs['placeholder'] = "+7 (___) ___-__-__"
+
 
 class SearchParcelsForm(forms.Form):
     search = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Поиск'}), required=False)

@@ -57,9 +57,15 @@ span.digits {
 .red {
 color: red !important;
 }
+.blue {
+color: blue !important;
+}
+.yellow {
+color: #baba00 !important;
+}
 
 .logo {
-width: 65px;
+width: 125px;
 }
 
 .login-form {

@@ -76,7 +76,7 @@ def get_report(start_date: datetime, end_date: datetime, routes: list[dict]):
     results = {
         'parcels': {
             'total': len(parcels),
-            'delivered': len(parcels.filter(ship_status=ShipStatus.objects.get(id__in=[2, 4]))),
+            'delivered': len(parcels.filter(ship_status__in=ShipStatus.objects.filter(id__in=[2, 4]))),
             'in_process': len(parcels.filter(ship_status__in=ShipStatus.objects.filter(id__in=[1, 3])))
         },
         'amounts': {

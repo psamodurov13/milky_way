@@ -100,10 +100,19 @@ def index(request):
         else:
             current_route = request.session['route']
         logger.info(f'ROUTES - {routes}')
-        all_parcels = Parcel.objects.filter(
-            from_office__in=City.objects.get(id=current_route['from_id']).offices.all(),
-            to_office__in=City.objects.get(id=current_route['to_id']).offices.all(),
-        )
+        logger.info(f'current_route - {current_route}')
+        try:
+            all_parcels = Parcel.objects.filter(
+                from_office__in=City.objects.get(id=current_route['from_id']).offices.all(),
+                to_office__in=City.objects.get(id=current_route['to_id']).offices.all(),
+            )
+        except Exception:
+            logger.exception(Exception)
+            current_route = {'from_id': routes[0]['from_city'].id, 'to_id': routes[0]['to_city'].id}
+            all_parcels = Parcel.objects.filter(
+                from_office__in=City.objects.get(id=current_route['from_id']).offices.all(),
+                to_office__in=City.objects.get(id=current_route['to_id']).offices.all(),
+            )
         search_query = request.GET.get('search', None)
         logger.info(f'SEARCH - {search_query}')
         if search_query:
@@ -174,7 +183,7 @@ def create_new_parcel(request):
             logger.info(f'FORM DATA - {form_data}')
             for customer in ['from_customer', 'to_customer']:
                 if '/' in form_data[customer]:
-                    customer_name = form_data[customer].split(' / ')[0]
+                    customer_name = form_data[customer].split(' / ')[1]
                     customer_phone = form_data[f'{customer}'].split(' / ')[-1]
                     logger.info(f'CUSTOMER NAME {customer_name}, CUSTOMER PHONE {customer_phone}')
                     customer_object = Customer.objects.get(name=customer_name, phone=customer_phone)

@@ -34,11 +34,11 @@
         <th scope="col">Телефон получателя</th>
         <th scope="col">Код</th>
         <th scope="col">Плательщик</th>
-        <th scope="col">Статус оплаты</th>
         <th scope="col">Статус посылки</th>
         <th scope="col">Дата выдачи</th>
         <th scope="col">Посылку оформил</th>
         <th scope="col">Посылку выдал</th>
+        <th scope="col">Статус оплаты</th>
       </tr>
     </thead>
     <tbody>
@@ -54,19 +54,23 @@
         {% else %}
         <td class="red">Получатель</td>
         {% endif %}
+        {% if parcel.ship_status.id == 2 %}
+        <td class="green">{{ parcel.ship_status.name }}</td>
+        {% elif parcel.ship_status.id == 4 %}
+        <td class="blue">{{ parcel.ship_status.name }}</td>
+        {% elif parcel.ship_status.id == 1 %}
+        <td class="red">{{ parcel.ship_status.name }}</td>
+        {% else %}
+        <td class="yellow">{{ parcel.ship_status.name }}</td>
+        {% endif %}
+        <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
+        <td>{{ parcel.created_by.first_name }}</td>
+        <td>{{ parcel.delivered_by.first_name }}</td>
         {% if parcel.payment_status %}
         <td class="green">Оплачено</td>
         {% else %}
         <td class="red">Не оплачено</td>
         {% endif %}
-        {% if parcel.ship_status.id == 2 %}
-        <td class="green">{{ parcel.ship_status.name }}</td>
-        {% else %}
-        <td class="red">{{ parcel.ship_status.name }}</td>
-        {% endif %}
-        <td>{{ parcel.complete_date|date:'d.m.y H:m' }}</td>
-        <td>{{ parcel.created_by.first_name }}</td>
-        <td>{{ parcel.delivered_by.first_name }}</td>
       </tr>
     {% endfor %}
     </tbody>
