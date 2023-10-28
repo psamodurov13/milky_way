@@ -8,10 +8,7 @@ from .utils import get_balance, get_all_routes
 import sys
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Field
-
-
-
-from .models import Parcel, Customer, Office, Payer, CashCollection
+from .models import Parcel, Customer, Office, Payer, CashCollection, City
 from users.models import User
 
 if 'makemigrations' not in sys.argv and 'migrate' not in sys.argv:
@@ -42,6 +39,9 @@ class UserLoginForm(AuthenticationForm):
 class NewParcelForm(forms.Form):
     from_customer = forms.CharField(label='Отправитель', widget=forms.TextInput())
     from_customer_phone = PhoneNumberField(label='Телефон отправителя', widget=forms.TextInput())
+    if not migrations:
+        to_office = forms.ChoiceField(label='Офис', choices=[(i.id, i.name) for i in Office.objects.all()],
+                                      widget=forms.Select())
     to_customer = forms.CharField(label='Получатель', widget=forms.TextInput())
     to_customer_phone = PhoneNumberField(label='Телефон получателя', widget=forms.TextInput())
     if not migrations:
@@ -50,7 +50,11 @@ class NewParcelForm(forms.Form):
     price = forms.FloatField(label='Стоимость')
 
     def __init__(self, *args, **kwargs):
+        to_city_id = kwargs.pop('to_city', None)
         super().__init__(*args, **kwargs)
+        if not migrations and to_city_id:
+            offices = [(i.id, i.name) for i in Office.objects.filter(city=City.objects.get(id=to_city_id))]
+            self.fields['to_office'].choices = offices
         self.fields['from_customer_phone'].widget.attrs['data-phone-pattern'] = "+7 (___) ___-__-__"
         self.fields['from_customer_phone'].widget.attrs['placeholder'] = "+7 (___) ___-__-__"
         self.fields['to_customer_phone'].widget.attrs['data-phone-pattern'] = "+7 (___) ___-__-__"

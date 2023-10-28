@@ -16,7 +16,6 @@ from barcode import generate
 from barcode.writer import ImageWriter
 
 
-
 @login_required
 def index(request):
     context = {
@@ -54,14 +53,19 @@ def index(request):
         logger.info(f'USER OFFICE - {user_office}')
         if current_way == 'sent':
             all_parcels = Parcel.objects.filter(
-                from_office__in=City.objects.get(id=current_route['from_id']).offices.all(),
+                from_office=user_office,
                 to_office__in=City.objects.get(id=current_route['to_id']).offices.all(),
             )
+            logger.info(f'FROM OFFICE - {user_office}')
+            logger.info(f"TO OFFICES - {City.objects.get(id=current_route['to_id']).offices.all()}")
         else:
             all_parcels = Parcel.objects.filter(
-                to_office__in=City.objects.get(id=current_route['from_id']).offices.all(),
+                to_office=user_office,
                 from_office__in=City.objects.get(id=current_route['to_id']).offices.all(),
             )
+            logger.info(f"FROM OFFICE - {City.objects.get(id=current_route['to_id']).offices.all()}")
+            logger.info(f"TO OFFICE - {user_office}")
+        logger.info(f'ALL PARCELS - {all_parcels}')
         if search_query and search_query != '':
             search_form = SearchParcelsForm(request.GET)
             if search_query.isdigit():
@@ -85,7 +89,7 @@ def index(request):
         context['user'] = request.user
         context['office'] = user_office
         context['routes'] = routes
-        context['new_parcel_form'] = NewParcelForm()
+        context['new_parcel_form'] = NewParcelForm(to_city=current_route['to_id'])
         context['customers'] = Customer.objects.all()
         context['search_form'] = search_form
         context['way'] = current_way
@@ -176,7 +180,7 @@ def user_logout(request):
 def create_new_parcel(request):
     logger.info(f'SEND FORM CREATE NEW PARCEL')
     if request.method == 'POST':
-        form = NewParcelForm(request.POST)
+        form = NewParcelForm(request.POST, to_city=request.session['route']['to_id'])
         logger.info(f'METHOD POST, REQUEST - {request.POST}')
         if form.is_valid():
             form_data = form.cleaned_data
@@ -206,9 +210,9 @@ def create_new_parcel(request):
             route = request.session['route']
             logger.info(f'REQUEST ROUTE - {route}')
             new_parcel = Parcel.objects.create(
-                from_office=City.objects.get(id=route['from_id']).offices.all()[0],
+                from_office=request.user.office,
                 from_customer=from_customer,
-                to_office=City.objects.get(id=route['to_id']).offices.all()[0],
+                to_office=Office.objects.get(id=form_data['to_office']),
                 to_customer=to_customer,
                 payer=Payer.objects.get(id=int(form_data['payer'])),
                 ship_status=ShipStatus.objects.get(id=4),
@@ -348,8 +352,8 @@ def receive_to_office(request):
     logger.info(f'RECEIVE TO OFFICE STARTED')
     route = request.session['route']
     delivering_parcels = Parcel.objects.filter(
-        from_office=City.objects.get(id=route['to_id']).offices.all()[0],
-        to_office=City.objects.get(id=route['from_id']).offices.all()[0],
+        from_office__in=City.objects.get(id=route['to_id']).offices.all(),
+        to_office=request.user.office,
         ship_status=ShipStatus.objects.get(id=3),
     )
     all_sms_tasks_to = []
@@ -359,7 +363,9 @@ def receive_to_office(request):
         parcel.save()
         sms_text = f'''Ваша посылка доставлена в офис службы доставки "Млечный путь". Код-{parcel.id}. '''
         all_sms_tasks_to.append(send_sms(str(parcel.to_customer.phone), sms_text))
+        logger.info(f'SMS WAS SENT TO {str(parcel.to_customer.phone)}')
         all_sms_tasks_from.append(send_sms(str(parcel.from_customer.phone), sms_text))
+        logger.info(f'SMS WAS SENT TO {str(parcel.from_customer.phone)}')
     logger.info(f'SMS TO {all_sms_tasks_to}')
     logger.info(f'SMS FROM {all_sms_tasks_from}')
     messages.success(request, f'Принято посылок - {len(delivering_parcels)} ')
@@ -371,8 +377,8 @@ def send_to_office(request):
     logger.info(f'SEND TO OFFICE STARTED')
     route = request.session['route']
     parcels_for_send = Parcel.objects.filter(
-        from_office=City.objects.get(id=route['from_id']).offices.all()[0],
-        to_office=City.objects.get(id=route['to_id']).offices.all()[0],
+        from_office=request.user.office,
+        to_office__in=City.objects.get(id=route['to_id']).offices.all(),
         ship_status=ShipStatus.objects.get(id=4),
     )
     for parcel in parcels_for_send:
