@@ -229,9 +229,10 @@ def create_new_parcel(request):
             if 'send-print-button' in request.POST['button-clicked']:
                 logger.info(f'WITH PRINT')
                 barcode_file = generate('code128', str(new_parcel.id), writer=ImageWriter(), output=f'./media/barcode-{new_parcel.id}')
-                text = f'''<p>{new_parcel.to_customer.name}</p>                       
-<p>{str(new_parcel.from_customer.phone)}</p>
-<p>{str(new_parcel.to_customer.phone)}</p>
+                text = f'''<script src="https://kit.fontawesome.com/5cb1663449.js" crossorigin="anonymous"></script>
+<p>{new_parcel.to_customer.name}</p>                       
+<p>🤵<i class="fa-solid fa-right-long"></i> {str(new_parcel.from_customer.phone)}</p>
+<p>🤵<i class="fa-solid fa-left-long"></i> {str(new_parcel.to_customer.phone)}</p>
 <p>Код: <b>{new_parcel.id}</b></p>
 <p>Стоимость: {new_parcel.price}</p>
 <p>Плательщик: {new_parcel.payer.name}</p>
